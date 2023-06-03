@@ -1,0 +1,48 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.SchoolMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加学校记录 -->
+	<insert id="addSchool" parameterType="school">
+		insert into t_school(schoolName) values 
+		(#{schoolName})
+	</insert>
+
+	<!-- 按照查询条件分页查询学校记录 -->
+	<select id="querySchool" resultMap="schoolMap" >
+		select t_school.* from t_school ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="schoolMap" type="school">
+        <id property="schoolId" column="schoolId" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有学校记录 -->
+	<select id="querySchoolList" resultMap="schoolMap" >
+		select t_school.* from t_school ${where}
+	</select>
+
+    <!-- 按照查询条件的学校记录数 -->
+	<select id="querySchoolCount" resultType="int">
+		select count(*) from t_school ${where}
+	</select>
+
+	<!-- 根据主键查询某个学校记录 -->
+	<select id="getSchool" parameterType="int" resultMap="schoolMap">
+		select * from t_school where t_school.schoolId = #{schoolId}
+	</select>
+
+	<!-- 更新学校记录 -->
+	<update id="updateSchool" parameterType="school">
+		update t_school set schoolName=#{schoolName} where schoolId = #{schoolId}
+	</update>
+
+	<!-- 删除学校记录 -->
+	<delete id="deleteSchool" parameterType="int">
+		delete from t_school where schoolId=#{schoolId}
+	</delete>
+
+</mapper>

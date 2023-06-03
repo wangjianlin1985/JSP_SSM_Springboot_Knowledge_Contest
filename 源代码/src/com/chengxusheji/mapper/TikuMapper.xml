@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.TikuMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加题库测试记录 -->
+	<insert id="addTiku" parameterType="tiku">
+		insert into t_tiku(tikuTypeObj,tikuName,tikuContent,hitNum,addTime) values 
+		(#{tikuTypeObj.typeId},#{tikuName},#{tikuContent},#{hitNum},#{addTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询题库测试记录 -->
+	<select id="queryTiku" resultMap="tikuMap" >
+		select t_tiku.* from t_tiku,t_tikuType ${where} and t_tiku.tikuTypeObj = t_tikuType.typeId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="tikuMap" type="tiku">
+        <id property="tikuId" column="tikuId" />
+        <association property="tikuTypeObj" column="tikuTypeObj" select="com.chengxusheji.mapper.TikuTypeMapper.getTikuType" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有题库测试记录 -->
+	<select id="queryTikuList" resultMap="tikuMap" >
+		select t_tiku.* from t_tiku,t_tikuType ${where} and t_tiku.tikuTypeObj = t_tikuType.typeId
+	</select>
+
+    <!-- 按照查询条件的题库测试记录数 -->
+	<select id="queryTikuCount" resultType="int">
+		select count(*) from t_tiku,t_tikuType ${where} and t_tiku.tikuTypeObj = t_tikuType.typeId
+	</select>
+
+	<!-- 根据主键查询某个题库测试记录 -->
+	<select id="getTiku" parameterType="int" resultMap="tikuMap">
+		select * from t_tiku where t_tiku.tikuId = #{tikuId}
+	</select>
+
+	<!-- 更新题库测试记录 -->
+	<update id="updateTiku" parameterType="tiku">
+		update t_tiku set tikuTypeObj=#{tikuTypeObj.typeId},tikuName=#{tikuName},tikuContent=#{tikuContent},hitNum=#{hitNum},addTime=#{addTime} where tikuId = #{tikuId}
+	</update>
+
+	<!-- 删除题库测试记录 -->
+	<delete id="deleteTiku" parameterType="int">
+		delete from t_tiku where tikuId=#{tikuId}
+	</delete>
+
+</mapper>

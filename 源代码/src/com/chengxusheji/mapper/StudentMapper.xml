@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.StudentMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加报名学生记录 -->
+	<insert id="addStudent" parameterType="student">
+		insert into t_student(user_name,password,contest,name,gender,birthDate,userPhoto,telephone,address,signUpTime) values 
+		(#{user_name},#{password},#{contest.contestId},#{name},#{gender},#{birthDate},#{userPhoto},#{telephone},#{address},#{signUpTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询报名学生记录 -->
+	<select id="queryStudent" resultMap="studentMap" >
+		select t_student.* from t_student,t_contest ${where} and t_student.contest = t_contest.contestId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="studentMap" type="student">
+        <id property="user_name" column="user_name" />
+        <association property="contest" column="contest" select="com.chengxusheji.mapper.ContestMapper.getContest" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有报名学生记录 -->
+	<select id="queryStudentList" resultMap="studentMap" >
+		select t_student.* from t_student,t_contest ${where} and t_student.contest = t_contest.contestId
+	</select>
+
+    <!-- 按照查询条件的报名学生记录数 -->
+	<select id="queryStudentCount" resultType="int">
+		select count(*) from t_student,t_contest ${where} and t_student.contest = t_contest.contestId
+	</select>
+
+	<!-- 根据主键查询某个报名学生记录 -->
+	<select id="getStudent" parameterType="string" resultMap="studentMap">
+		select * from t_student where t_student.user_name = #{user_name}
+	</select>
+
+	<!-- 更新报名学生记录 -->
+	<update id="updateStudent" parameterType="student">
+		update t_student set password=#{password},contest=#{contest.contestId},name=#{name},gender=#{gender},birthDate=#{birthDate},userPhoto=#{userPhoto},telephone=#{telephone},address=#{address},signUpTime=#{signUpTime} where user_name = #{user_name}
+	</update>
+
+	<!-- 删除报名学生记录 -->
+	<delete id="deleteStudent" parameterType="string">
+		delete from t_student where user_name=#{user_name}
+	</delete>
+
+</mapper>

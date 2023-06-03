@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ScoreMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加比赛成绩记录 -->
+	<insert id="addScore" parameterType="score">
+		insert into t_score(contestObj,studentObj,contentRound,scoreValue) values 
+		(#{contestObj.contestId},#{studentObj.user_name},#{contentRound},#{scoreValue})
+	</insert>
+
+	<!-- 按照查询条件分页查询比赛成绩记录 -->
+	<select id="queryScore" resultMap="scoreMap" >
+		select t_score.* from t_score,t_contest,t_student ${where} and t_score.contestObj = t_contest.contestId and t_score.studentObj = t_student.user_name order by t_score.scoreValue DESC limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="scoreMap" type="score">
+        <id property="scoreId" column="scoreId" />
+        <association property="contestObj" column="contestObj" select="com.chengxusheji.mapper.ContestMapper.getContest" />
+        <association property="studentObj" column="studentObj" select="com.chengxusheji.mapper.StudentMapper.getStudent" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有比赛成绩记录 -->
+	<select id="queryScoreList" resultMap="scoreMap" >
+		select t_score.* from t_score,t_contest,t_student ${where} and t_score.contestObj = t_contest.contestId and t_score.studentObj = t_student.user_name
+	</select>
+
+    <!-- 按照查询条件的比赛成绩记录数 -->
+	<select id="queryScoreCount" resultType="int">
+		select count(*) from t_score,t_contest,t_student ${where} and t_score.contestObj = t_contest.contestId and t_score.studentObj = t_student.user_name
+	</select>
+
+	<!-- 根据主键查询某个比赛成绩记录 -->
+	<select id="getScore" parameterType="int" resultMap="scoreMap">
+		select * from t_score where t_score.scoreId = #{scoreId}
+	</select>
+
+	<!-- 更新比赛成绩记录 -->
+	<update id="updateScore" parameterType="score">
+		update t_score set contestObj=#{contestObj.contestId},studentObj=#{studentObj.user_name},contentRound=#{contentRound},scoreValue=#{scoreValue} where scoreId = #{scoreId}
+	</update>
+
+	<!-- 删除比赛成绩记录 -->
+	<delete id="deleteScore" parameterType="int">
+		delete from t_score where scoreId=#{scoreId}
+	</delete>
+
+</mapper>

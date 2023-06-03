@@ -1,0 +1,66 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ContestMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加比赛记录 -->
+	<insert id="addContest" parameterType="contest">
+		insert into t_contest(schoolObj,projectObj,contestName,contestDesc,contestPlace,personNumber,signUpTime,endTime) values 
+		(#{schoolObj.schoolId},#{projectObj.projectId},#{contestName},#{contestDesc},#{contestPlace},#{personNumber},#{signUpTime},#{endTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询比赛记录 -->
+	<select id="queryContest" resultMap="contestMap" >
+		select t_contest.* from t_contest,t_project,t_school ${where} and t_contest.schoolObj = t_school.schoolId and t_contest.projectObj = t_project.projectId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="contestMap" type="contest">
+        <id property="contestId" column="contestId" />
+        <association property="schoolObj" column="schoolObj" select="com.chengxusheji.mapper.SchoolMapper.getSchool" />
+        <association property="projectObj" column="projectObj" select="com.chengxusheji.mapper.ProjectMapper.getProject" />
+    </resultMap>
+    
+    
+    <!-- 用户按照查询条件分页查询比赛记录 -->
+	<select id="userQueryContest" resultMap="contestMap" >
+		select t_contest.* from t_student,t_contest,t_project,t_school ${where} and t_student.contest = t_contest.contestId and t_contest.schoolObj = t_school.schoolId and t_contest.projectObj = t_project.projectId limit #{startIndex},#{pageSize}
+	</select>
+	  
+    
+
+    <!-- 按照查询条件查询所有比赛记录 -->
+	<select id="queryContestList" resultMap="contestMap" >
+		select t_contest.* from t_contest,t_project,t_school ${where} and t_contest.schoolObj = t_school.schoolId and t_contest.projectObj = t_project.projectId
+	</select>
+
+    <!-- 按照查询条件的比赛记录数 -->
+	<select id="queryContestCount" resultType="int">
+		select count(*) from t_contest,t_project,t_school ${where} and t_contest.schoolObj = t_school.schoolId and t_contest.projectObj = t_project.projectId
+	</select>
+	
+	
+	<!-- 用户按照查询条件的比赛记录数 -->
+	<select id="userQueryContestCount" resultType="int">
+		select count(*) from t_student,t_contest,t_project,t_school ${where} and t_student.contest = t_contest.contestId and t_contest.schoolObj = t_school.schoolId and t_contest.projectObj = t_project.projectId
+	</select>
+	
+	
+
+	<!-- 根据主键查询某个比赛记录 -->
+	<select id="getContest" parameterType="int" resultMap="contestMap">
+		select * from t_contest where t_contest.contestId = #{contestId}
+	</select>
+
+	<!-- 更新比赛记录 -->
+	<update id="updateContest" parameterType="contest">
+		update t_contest set schoolObj=#{schoolObj.schoolId},projectObj=#{projectObj.projectId},contestName=#{contestName},contestDesc=#{contestDesc},contestPlace=#{contestPlace},personNumber=#{personNumber},signUpTime=#{signUpTime},endTime=#{endTime} where contestId = #{contestId}
+	</update>
+
+	<!-- 删除比赛记录 -->
+	<delete id="deleteContest" parameterType="int">
+		delete from t_contest where contestId=#{contestId}
+	</delete>
+
+</mapper>
